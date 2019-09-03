@@ -53,19 +53,19 @@ function provideDefinition(document, position, token) {
     let methodArr = ['get', 'post', 'put', 'delete']
     let method = 'get'
     // 针对mock数据处理
-    if (/^\/api/.test(libPath)) {
-
-        let temp = line.text.match(/\.([a-z]{3,6})\(/)[1];
+    if (/^\/api|^\/j/.test(libPath)) {
+        let temp = line.text.match(/\.([a-z]{3,6})\(/);
+        temp = temp&&temp[1] || '';
         if (methodArr.includes(temp)) {
             method = temp
         }
+
         libPath = "mock/api/" + method + '/' + libPath + "/data.json";
 
     }
 
     let workDir1 = workDir.split(path.sep);
-    workDir = workDir1.slice(0, workDir1.indexOf("src")).join("/");
-
+    workDir = workDir1.slice(0, workDir1.indexOf("lib")!==-1?workDir1.indexOf("lib"):workDir1.indexOf("src")!==-1?workDir1.indexOf("src"):workDir1.indexOf("raw")).join("/");
     let destPath = path.resolve(workDir, libPath);
     // 判断是否存在文件并进行添加后缀
     extArr.some(item => {
