@@ -3,6 +3,7 @@
 	"displayName": "jump-import",
 	"description": "调到你import的文件里面去,caiji diyici xiechajian,xi wang dalao daidaiwo,jump the code you import file",
 	"version": "0.0.3",
+	"icon": "res/img/pic.jpg",
 	"publisher": "notfoundgithub",
 	"engines": {
 		"vscode": "^1.37.0"
