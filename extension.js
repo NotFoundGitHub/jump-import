@@ -16,18 +16,18 @@ function isExistFile(file) {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function provideDefinition(document, position, token) {
-    console.log("====== 进入 provideDefinition 方法 ======");
+    // console.log("====== 进入 provideDefinition 方法 ======");
     const fileName = document.fileName;
     let workDir = path.dirname(fileName);
     const word = document.getText(document.getWordRangeAtPosition(position));
     const line = document.lineAt(position);
 
-    console.log("fileName: ", fileName); // 当前文件完整路径
-    console.log("workDir: ", workDir); // 当前文件所在目录
-    console.log("word: ", word); // 当前光标所在单词
-    console.log("line: ", line.text); // 当前光标所在行
+    // console.log("fileName: ", fileName); // 当前文件完整路径
+    // console.log("workDir: ", workDir); // 当前文件所在目录
+    // console.log("word: ", word); // 当前光标所在单词
+    // console.log("line: ", line.text); // 当前光标所在行
     // 只处理package.json文件
-    console.log(word, line.text);
+    // console.log(word, line.text);
     // 简写
     let aliasConf = {
         "@": "src",
@@ -49,7 +49,7 @@ function provideDefinition(document, position, token) {
         .match(/'(.+)'|"(.+)"|`(.+)`/gim)[0]
         .replace(/\'|\"|\`/gim, "")
         .replace(`${alias}`, `${aliasConf[alias]}`);
-    console.log("libPath: ", libPath); // 当前光标所在行
+    // console.log("libPath: ", libPath); // 当前光标所在行
     let methodArr = ['get', 'post', 'put', 'delete']
     let method = 'get'
     // 针对mock数据处理
@@ -78,7 +78,7 @@ function provideDefinition(document, position, token) {
         return false;
     });
 
-    console.log("destPath: ", destPath);
+    // console.log("destPath: ", destPath);
     if (fs.existsSync(destPath)) {
         // new vscode.Position(0, 0) 表示跳转到某个文件的第一行第一列
         return new vscode.Location(
@@ -91,9 +91,9 @@ function provideDefinition(document, position, token) {
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
+    // Use the // console to output diagnostic information (// console.log) and errors (// console.error)
     // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "helloworld" is now active!');
+    // console.log('Congratulations, your extension "helloworld" is now active!');
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
