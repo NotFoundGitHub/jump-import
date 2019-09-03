@@ -1,4 +1,7 @@
-<<<<<<< HEAD
+
+# jump-import
+跳转代码插件
+=======
 # jump-import README
 
 This is the README for your extension "jump-import". After writing up a brief description, we recommend including the following sections.
@@ -64,7 +67,3 @@ Added features X, Y, and Z.
 * [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**
-=======
-# jump-import
-跳转代码插件
->>>>>>> 435f126d022d3d07e1d16c572b0a6d14d506d70c
