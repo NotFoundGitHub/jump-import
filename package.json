@@ -2,7 +2,7 @@
 	"name": "jump-import",
 	"displayName": "jump-import",
 	"description": "快速跳转到你import的文件里面去(无论你是 @还是 pool还是 ../都可以)，并支持跳转nei的mock数据data.json",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"icon": "res/img/pic.jpg",
 	"publisher": "notfoundgithub",
 	"engines": {
@@ -23,8 +23,7 @@
 		"onLanguage:html"
 	],
 	"main": "./extension.js",
-	"contributes": {
-	},
+	"contributes": {},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
