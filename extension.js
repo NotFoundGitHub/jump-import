@@ -1,124 +1,122 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
-
 const path = require("path");
 const fs = require("fs");
 
-function isExistFile(file) {
-    try {
-        fs.accessSync(file, fs.constants.F_OK);
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+const getAliasConfig = require("./lib/common/getAliasConfig")
+const isExistFile = require("./lib/common/isExistFile");
+const getCurrentAliasKey = require("./lib/common/getCurrentAliasKey");
+const handleMockJson = require("./lib/common/handleMockJson");
+
+// 简写配置
+let config;
+
 function provideDefinition(document, position, token) {
-    const fileName = document.fileName;
-    let workDir = path.dirname(fileName);
-    const word = document.getText(document.getWordRangeAtPosition(position));
-    const line = document.lineAt(position);
+	const fileName = document.fileName;
+	let workDir = path.dirname(fileName);
+	// const word = document.getText(document.getWordRangeAtPosition(position));
+	const line = document.lineAt(position);
 
-    console.log("fileName: ", fileName); // 当前文件完整路径
-    console.log("line: ", line.text); // 当前光标所在行
-    // 简写
-    let aliasConf = {
-        "@": "src",
-        pool: "lib"
-    };
-    // 文件后缀类型
-    let extArr = [".js", ".vue", ".json", ".html"];
-    let libPath = line.text;
-    let alias = "lib";
+	// 获得根目录
+	let workDir1 = workDir.split(path.sep);
+	let root = workDir1
+		.slice(
+			0,
+			workDir1.indexOf("lib") !== -1
+				? workDir1.indexOf("lib")
+				: workDir1.indexOf("src") !== -1
+					? workDir1.indexOf("src")
+					: workDir1.indexOf("raw")!== -1
+						? workDir1.indexOf("raw")
+						: workDir1.indexOf("config")!== -1
+							? workDir1.indexOf("config")
+							: workDir1.indexOf("tool")
+		)
+		.join("/");
+	console.log("root", root);
+	let mode;
 
-    // 后缀判断
-    if (libPath.includes("pool")) {
-        alias = "pool";
-    } else if (libPath.includes("@")) {
-        alias = "@";
-    }
-    // 获取import里面内容
-    libPath = libPath
-        .match(/'(.+)'|"(.+)"|`(.+)`/gim)[0]
-        .replace(/\'|\"|\`/gim, "")
-        .replace(`${alias}`, `${aliasConf[alias]}`);
-    console.log("libPath: ", libPath); // 当前光标所在行
-    let methodArr = ['get', 'post', 'put', 'delete']
-    let method = 'get'
-    // 针对mock数据处理
-    if (/^\/api|^\/j/.test(libPath)) {
-        let temp = line.text.match(/\.([a-z]{3,6})\(/);
-        temp = temp&&temp[1] || '';
-        if (methodArr.includes(temp)) {
-            method = temp
-        }
+	// 判断是否存在别名配置，避免重复读取
+	if (!config) {
+		config = getAliasConfig(root)
+	}
+	aliasConfig = config.setting;
+	mode = config.mode;
 
-        libPath = "mock/api/" + method + '/' + libPath + "/data.json";
 
-    }
+	console.log("line: ", line.text); // 当前光标所在行
+	// 简写
+	aliasConfig = {
+		"@": "/src/",
+		...aliasConfig
+	}
 
-    let workDir1 = workDir.split(path.sep);
-    workDir = workDir1.slice(0, workDir1.indexOf("lib")!==-1?workDir1.indexOf("lib"):workDir1.indexOf("src")!==-1?workDir1.indexOf("src"):workDir1.indexOf("raw")).join("/");
-    let destPath = path.resolve(workDir, libPath);
-    // 判断是否存在文件并进行添加后缀
-    extArr.some(item => {
-        if (isExistFile(destPath + item)) {
-            destPath = destPath + item;
-            return true;
-        } else if (isExistFile(destPath)) {
-            return true;
-        }
-        return false;
-    });
+	const methodArr = ["get", "post", "put", "delete"];
+	// 文件后缀类型
+	const extArr = [".js", ".vue", ".json", ".html"];
 
-    console.log("destPath: ", destPath);
-    if (fs.existsSync(destPath)) {
-        // new vscode.Position(0, 0) 表示跳转到某个文件的第一行第一列
-        return new vscode.Location(
-            vscode.Uri.file(destPath),
-            new vscode.Position(0, 0)
-        );
-    }
+
+	let libPath = line.text;
+	let alias = "lib";
+
+	console.log("libPath: ", libPath); // 当前光标所在行
+
+	// 获取import里面内容
+	let target = /'(.+)'|"(.+)"|`(.+)`/gim.exec(libPath)[1];
+	console.log("target: ", target);
+
+	// pool/k12-cache-business/src/cache-course/common/constant
+	let prefix = getCurrentAliasKey(target, aliasConfig);
+
+	console.log("prefix: ", prefix);
+
+	let content = (prefix ? target.replace(`${prefix}/`, `${aliasConfig[prefix]}`) : target).replace("{mode}", mode === "wap" ? "wap" : "web");
+
+	// 针对mock数据处理
+	if (/^\/api|^\/j |^\/p/.test(content)) {
+		content = handleMockJson(root, line.text, content, methodArr);
+	}
+	console.log("content: ", content); // 当前光标所在行
+
+	let destPath;
+	if (content.split("/")[0].includes(".")) {
+		destPath = path.resolve(workDir, content);
+	} else {
+		destPath = path.join(root, content);
+	}
+
+	console.log("destPath: ", destPath); // 当前光标所在行
+
+	// 判断是否存在文件并进行添加后缀
+	if (!isExistFile(destPath)) {
+		extArr.some(item => {
+			if (isExistFile(destPath + item)) {
+				destPath = destPath + item;
+				return true;
+			}
+		});
+	}
+	// 跳转文件
+	if (fs.existsSync(destPath)) {
+		return new vscode.Location(
+			vscode.Uri.file(destPath),
+			new vscode.Position(0, 0)
+		);
+	}
 }
-/**
- * @param {vscode.ExtensionContext} context
- */
+
 function activate(context) {
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "helloworld" is now active!');
-
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with  registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand(
-        "extension.helloWorld",
-        function () {
-            // The code you place here will be executed every time your command is executed
-
-            // Display a message box to the user
-            vscode.window.showInformationMessage("Hello World!");
-        }
-    );
-
-    context.subscriptions.push(
-        vscode.languages.registerDefinitionProvider(
-            ["vue", 'javascript', 'json', 'html'],
-            {
-                provideDefinition
-            })
-    );
-
-    context.subscriptions.push(disposable);
+	let disposable = vscode.languages.registerDefinitionProvider(
+		["javascript", "vue", "json", "html","markdown","scss", "sass", "css", "ftl", "typescript","FreeMarker"],
+		{
+			provideDefinition
+		}
+	)
+	context.subscriptions.push(disposable);
 }
 exports.activate = activate;
-
-// this method is called when your extension is deactivated
 function deactivate() { }
 
 module.exports = {
-    activate,
-    deactivate
+	activate,
+	deactivate
 };

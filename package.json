@@ -1,7 +1,7 @@
 {
 	"name": "jump-import",
 	"displayName": "jump-import",
-	"description": "调到你import的文件里面去,caiji diyici xiechajian,xi wang dalao daidaiwo,jump the code you import file",
+	"description": "快速跳转到你import的文件里面去(无论你是 @还是 pool还是 ../都可以)，并支持跳转nei的mock数据data.json",
 	"version": "0.0.4",
 	"icon": "res/img/pic.jpg",
 	"publisher": "notfoundgithub",
@@ -12,20 +12,18 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld",
+		"onLanguage:javascript",
+		"onLanguage:typescript",
 		"onLanguage:vue",
-		"onLanguage:js",
+		"onLanguage:scss",
+		"onLanguage:css",
+		"onLanguage:markdown",
 		"onLanguage:json",
+		"onLanguage:FreeMarker",
 		"onLanguage:html"
 	],
 	"main": "./extension.js",
 	"contributes": {
-		"commands": [
-			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
-			}
-		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
