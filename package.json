@@ -39,6 +39,7 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile",
+		"publish": "vsce package && vsce publish patch",
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
