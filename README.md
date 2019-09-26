@@ -10,7 +10,19 @@
 
 ## 功能(feature)：跳转代码插件
 
+好了，我支持自定义了，开心了吧，举个栗子&#x1F447;
+```javascript
+    {
+        // settings.json
+        // 配置自定义的别名 路径前后带上斜杠/
+        "jump.alias": {
+            "wap":"/src/wap/javascript/"
+        },
+    }
+```
 
+
+&#x1F642; 支持网易nej工程，vue工程
 
 &#x1F642; 支持import内容中路径的跳转，尤其还增加了{mode}解析
 
@@ -36,12 +48,12 @@
 ## 演示&#x1F61D;
 1. 反正按Ctrl就对了，支持pool,pro，@只要你定义了，它都能跳
 
-![img](https://github.com/NotFoundGitHub/jump-import/blob/master/res/img/test1.gif)
+![img](https://raw.githubusercontent.com/NotFoundGitHub/jump-import/master/res/img/test1.gif)
 
 2. 无论你是常规方式还是axios，都可以跳转
 
-![img](https://github.com/NotFoundGitHub/jump-import/blob/master/res/img/test2.gif)
+![img](https://raw.githubusercontent.com/NotFoundGitHub/jump-import/master/res/img/test2.gif)
 
 3. 如果遇到define里面定义了很长的，可以回车一下，单独拎出来
 
-![img](https://github.com/NotFoundGitHub/jump-import/blob/master/res/img/test3.gif)
+![img](https://raw.githubusercontent.com/NotFoundGitHub/jump-import/master/res/img/test3.gif)

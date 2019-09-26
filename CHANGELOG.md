@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+用户可自由配置alias,在settings.json中可配置
+
+## 0.0.5
 - 全面大升级，支持更多配置
 - 无需自己配置，可自动寻找release.conf或者 config.ftl里面的配置
 - 对于webpack中vue的缩写配置 暂时没做

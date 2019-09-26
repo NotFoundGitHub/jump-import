@@ -6,6 +6,7 @@ const getAliasConfig = require("./lib/common/getAliasConfig")
 const isExistFile = require("./lib/common/isExistFile");
 const getCurrentAliasKey = require("./lib/common/getCurrentAliasKey");
 const handleMockJson = require("./lib/common/handleMockJson");
+const jsonf = require("./lib/common/jsonf");
 
 // 简写配置
 let config;
@@ -15,6 +16,7 @@ function provideDefinition(document, position, token) {
 	let workDir = path.dirname(fileName);
 	// const word = document.getText(document.getWordRangeAtPosition(position));
 	const line = document.lineAt(position);
+	const userSetting = vscode.workspace.getConfiguration('jump');
 
 	// 获得根目录
 	let workDir1 = workDir.split(path.sep);
@@ -29,15 +31,17 @@ function provideDefinition(document, position, token) {
 						? workDir1.indexOf("raw")
 						: workDir1.indexOf("config")!== -1
 							? workDir1.indexOf("config")
-							: workDir1.indexOf("tool")
+							: 0
 		)
-		.join("/");
+		.join("/") || vscode.workspace.rootPath;
+	// bug 多文件夹同时在编辑器rootpath会默认显示第一个
 	console.log("root", root);
 	let mode;
 
 	// 判断是否存在别名配置，避免重复读取
 	if (!config) {
 		config = getAliasConfig(root)
+		jsonf("config",config)
 	}
 	aliasConfig = config.setting;
 	mode = config.mode;
@@ -45,9 +49,11 @@ function provideDefinition(document, position, token) {
 
 	console.log("line: ", line.text); // 当前光标所在行
 	// 简写
+	const userAlias = userSetting&&userSetting.alias || {}
 	aliasConfig = {
 		"@": "/src/",
-		...aliasConfig
+		...aliasConfig,
+		...userAlias
 	}
 
 	const methodArr = ["get", "post", "put", "delete"];
@@ -72,7 +78,7 @@ function provideDefinition(document, position, token) {
 	let content = (prefix ? target.replace(`${prefix}/`, `${aliasConfig[prefix]}`) : target).replace("{mode}", mode === "wap" ? "wap" : "web");
 
 	// 针对mock数据处理
-	if (/^\/api|^\/j |^\/p/.test(content)) {
+	if (/^\/api|^\/j|^\/p/.test(content)) {
 		content = handleMockJson(root, line.text, content, methodArr);
 	}
 	console.log("content: ", content); // 当前光标所在行
@@ -96,11 +102,13 @@ function provideDefinition(document, position, token) {
 		});
 	}
 	// 跳转文件
-	if (fs.existsSync(destPath)) {
+	if (isExistFile(destPath)) {
 		return new vscode.Location(
 			vscode.Uri.file(destPath),
 			new vscode.Position(0, 0)
 		);
+	}else{
+		vscode.window.showErrorMessage("你这个文件好像不在");
 	}
 }
 
