@@ -107,8 +107,6 @@ function provideDefinition(document, position, token) {
 			vscode.Uri.file(destPath),
 			new vscode.Position(0, 0)
 		);
-	}else{
-		vscode.window.showErrorMessage("你这个文件好像不在");
 	}
 }
 
